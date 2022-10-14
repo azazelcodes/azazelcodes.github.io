@@ -1,6 +1,6 @@
 # WHAT IS THIS
 
-lil page for my brand
+lil page for fun
 
 
 # CAN I USE THIS
