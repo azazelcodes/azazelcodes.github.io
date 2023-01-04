@@ -27,13 +27,8 @@ itemStuff = {}
 hyIDs = []
 items = []
 
-def fixAH(name: str):
-    fixed = name.replace("⚚", "HERMES STAFF").replace("✪", "STAR ").replace("◆", "DIAMOND").replace("✿", "FLOWER").replace("✦", "SPARKLE")
-    fixed = fixed.replace("➊", "ONE").replace("➋", "TWO").replace("➌", "FIVE").replace("➍", "FOUR").replace("➎", "FIVE")
-    return fixed
-
 # GETTERS AND SETTERS
-def getAHFlips():
+def getLBins():
     bins.clear()
     index = 0
     with urllib.request.urlopen("https://api.hypixel.net/skyblock/auctions?page=0") as url:
@@ -45,6 +40,33 @@ def getAHFlips():
             if "bin" in key and key["bin"] == True:
                 bins.update({str(index): {"item": fixAH(key["item_name"]), "cost": price}})
             index += 1
+    
+    keys_by_item = {}
+    value_by_key = {}
+    price_compare = {}
+    lbins = {}
+
+    lbins.clear()
+
+    # Loop through the bins and add the keys and values to the maps
+    for key, value in bins.items():
+        item = value.get("item")
+        if item not in keys_by_item:
+            keys_by_item[item] = []
+        keys_by_item[item].append(key)
+        value_by_key[key] = value
+
+    # Loop through the map and print the values for each item value
+    for item, keys in keys_by_item.items():
+        for key in keys:
+            value = value_by_key[key]
+            for k, v in bins.items():
+                if v == value:
+                    price_compare.update({k: value})
+        sorted = list(price_compare.items())
+        sorted.sort(key=lambda x: x[1]['cost'], reverse=False)
+        lbins.update({sorted[0][0]: sorted[0][1]})
+        price_compare.clear()
 
 def getBZ():
     # This function retrieves data on items available for purchase on the Bazaar in the game Hypixel Skyblock
@@ -114,22 +136,10 @@ def getItems():
 
 # UTILITY FUNCTIONS
 
-def electionWarn():
-    # This function checks if 'Derpy' is currently the mayor in the game Hypixel Skyblock
-
-    # Retrieve data on the current mayor from the Hypixel Skyblock API
-    with urllib.request.urlopen("https://api.hypixel.net/resources/skyblock/election") as url:
-        data = json.loads(url.read().decode('utf-8'))
-        data = data["mayor"]
-        
-        # If the current mayor is 'Derpy', print a warning message and return True
-        if data["name"] == "Derpy":
-            print("Derpy is mayor! Auction flips are currently not supported! To disable this message turn AH Flips off in the settings.")
-            return True
-        
-        # If the current mayor is not 'Derpy', return False
-        else: 
-            return False
+def fixAH(name: str):
+    fixed = name.replace("⚚", "HERMES STAFF").replace("✪", "STAR ").replace("◆", "DIAMOND").replace("✿", "FLOWER").replace("✦", "SPARKLE")
+    fixed = fixed.replace("➊", "ONE").replace("➋", "TWO").replace("➌", "FIVE").replace("➍", "FOUR").replace("➎", "FIVE")
+    return fixed
 
 def calculateAHProfit(lowestBin: int, price: int):
 	if (lowestBin - price >= 1000000):
@@ -145,8 +155,13 @@ def refreshBZandNPC():
 
 
 
+
+
+
+
+
 refreshBZandNPC()
-getAHFlips()
+getLBins()
 
 with open('bz.json', 'w') as f:
     open('bz.json', 'w').close()
@@ -166,4 +181,4 @@ with open('items.json', 'w') as f:
 with open('ah.json', 'w') as f:
     open('ah.json', 'w').close()
     # Write the dictionary to the file in JSON format
-    json.dump(bins, f)
+    json.dump(lbins, f)
