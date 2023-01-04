@@ -27,7 +27,10 @@ itemStuff = {}
 hyIDs = []
 items = []
 
-
+def fixAH(name: str):
+    fixed = name.replace("⚚", "HERMES STAFF").replace("✪", "STAR ").replace("◆", "DIAMOND").replace("✿", "FLOWER").replace("✦", "SPARKLE")
+    fixed = fixed.replace("➊", "ONE").replace("➋", "TWO").replace("➌", "FIVE").replace("➍", "FOUR").replace("➎", "FIVE")
+    return fixed
 
 # GETTERS AND SETTERS
 def getAHFlips():
@@ -40,7 +43,7 @@ def getAHFlips():
             internalID = str(nbt.nbt.NBTFile(fileobj = io.BytesIO(base64.b64decode(key["item_bytes"]))))
             price = int(key["starting_bid"])
             if "bin" in key and key["bin"] == True:
-                bins.update({str(index): {"item": key["item_name"].encode("utf-8"), "cost": price}})
+                bins.update({str(index): {"item": fixAH(key["item_name"]), "cost": price}})
             index += 1
 
 def getBZ():
@@ -146,13 +149,21 @@ refreshBZandNPC()
 getAHFlips()
 
 with open('bz.json', 'w') as f:
+    open('bz.json', 'w').close()
     # Write the dictionary to the file in JSON format
     json.dump(bzStuff, f)
 
 with open('npc.json', 'w') as f:
+    open('npc.json', 'w').close()
     # Write the dictionary to the file in JSON format
     json.dump(npcStuff, f)
 
 with open('items.json', 'w') as f:
+    open('items.json', 'w').close()
     # Write the dictionary to the file in JSON format
     json.dump(itemStuff, f)
+
+with open('ah.json', 'w') as f:
+    open('ah.json', 'w').close()
+    # Write the dictionary to the file in JSON format
+    json.dump(bins, f)
